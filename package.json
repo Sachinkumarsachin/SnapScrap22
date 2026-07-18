@@ -1,0 +1,21 @@
+{
+  "name": "just_download",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "mime-types": "^3.0.2",
+    "open": "^11.0.0"
+  },
+  "devDependencies": {},
+  "description": ""
+}

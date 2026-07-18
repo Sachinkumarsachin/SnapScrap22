@@ -1,0 +1,76 @@
+name: Daily Download and Upload
+
+on:
+  schedule:
+    - cron: '15 21 * * *'   # Runs at 2:45 AM IST (21:15 UTC)
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run downloader with retry
+        run: |
+          for i in 1 2; do
+            echo "Attempt $i..."
+            node downServer.js && break
+            echo "Attempt $i failed, retrying..."
+            sleep 10
+          done
+
+      # NEW: save downloads so next job can use them
+      - name: Upload scraper output
+        uses: actions/upload-artifact@v4
+        with:
+          name: downloads
+          path: downloads/
+
+  upload:
+    runs-on: ubuntu-latest
+    needs: run-scraper   # ensures upload runs after scraper job
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # NEW: restore downloads from previous job
+      - name: Download scraper output
+        uses: actions/download-artifact@v4
+        with:
+          name: downloads
+          path: artifacts
+
+      - name: Setup rclone config
+        run: |
+          mkdir -p ~/.config/rclone
+          cat << 'EOF' > ~/.config/rclone/rclone.conf
+          ${{ secrets.RCLONE_CONFIG }}
+          EOF
+          chmod 600 ~/.config/rclone/rclone.conf
+
+      - name: Install rclone
+        run: curl -fsSL https://rclone.org/install.sh | sudo bash
+
+      - name: Verify rclone and remote
+        run: rclone listremotes
+
+      - name: Check artifacts content
+        run: ls -R artifacts
+
+      - name: Upload artifacts to Google Drive
+        run: |
+          rclone copy ./artifacts gdrive:/CI-Artifacts --progress -vv
+          rclone ls gdrive:/CI-Artifacts | tail -n 50
