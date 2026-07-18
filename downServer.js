@@ -391,7 +391,7 @@ const urls = [
   { name: "Anuradha 😺", url: "https://www.snapchat.com/@anuradha3112" },
   { name: "♡", url: "https://www.snapchat.com/@babydoll_20078" },
   { name: "Sinchna", url: "https://www.snapchat.com/@sinchnads" },
-  // { name: "Izzy", url: "https://www.snapchat.com/@sago_oficial" },
+   { name: "Izzy", url: "https://www.snapchat.com/@sago_oficial" },
   // {  name: "", url: "" },
   // { name: "", url: "" },
   // { name: "", url: "" },
